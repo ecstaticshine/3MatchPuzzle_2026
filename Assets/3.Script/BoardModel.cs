@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -59,7 +60,7 @@ public class BoardModel
             }
         }
 
-        return candidates[Random.Range(0, candidates.Count)];
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }
 
     HashSet<Vector2Int> FindMatches()
@@ -72,7 +73,7 @@ public class BoardModel
             int count = 1;
             for (int c = 1; c < BoardConstants.COLS; c++)
             {
-                if (grid[r, c].type != PuzzleType.None && 
+                if (grid[r, c].type != PuzzleType.None &&
                     grid[r, c - 1].type.Equals(grid[r, c].type))
                 {
                     count++;
@@ -105,7 +106,7 @@ public class BoardModel
             for (int r = 1; r < BoardConstants.ROWS; r++)
             {
                 if (grid[r, c].type != PuzzleType.None &&
-                    grid[r-1, c].type.Equals(grid[r, c].type))
+                    grid[r - 1, c].type.Equals(grid[r, c].type))
                 {
                     count++;
 
@@ -145,13 +146,13 @@ public class BoardModel
     }
 
     // ³«ÇÏ
-    void Fail()
+    void Fall()
     {
         for (int c = 0; c < BoardConstants.COLS; c++)
         {
             int emptyRow = BoardConstants.ROWS - 1; // ºóÄ­ Æ÷ÀÎÅÍ
 
-            for (int r = BoardConstants.ROWS - 1; r >= 0; r-- )
+            for (int r = BoardConstants.ROWS - 1; r >= 0; r--)
             {
                 if (grid[r, c].type != PuzzleType.None)
                 {
@@ -164,4 +165,37 @@ public class BoardModel
 
         }
     }
+
+    void Refill()
+    {
+        var values = Enum.GetValues(typeof(PuzzleType));
+
+        for (int r = 0; r < BoardConstants.ROWS; r++)
+        {
+            for (int c = 0; c < BoardConstants.COLS; c++)
+            {
+                if (grid[r, c].isActive && grid[r, c].type == PuzzleType.None)
+                {
+                    grid[r, c].type = (PuzzleType)values.GetValue(UnityEngine.Random.Range(1, values.Length));
+                }
+            }
+        }
+    }
+
+    public void ProcessBoard()
+    {
+        HashSet<Vector2Int> matched = null;
+
+        // FindMatches ¡æ RemoveMatches ¡æ Fall ¡æ Refill ¡æ ¹Ýº¹
+
+        matched = FindMatches();
+        while (matched.Count > 0)
+        {
+            RemoveMatches(matched);
+            Fall();
+            Refill();
+            matched = FindMatches();
+        }
+    }
+
 }
