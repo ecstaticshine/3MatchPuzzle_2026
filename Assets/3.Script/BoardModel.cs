@@ -19,6 +19,11 @@ public class BoardModel
 {
     private Cell[,] grid = new Cell[BoardConstants.ROWS, BoardConstants.COLS];
 
+    public Cell GetCell(int r, int c)
+    {
+        return grid[r, c];
+    }
+
     public void Initialize(StageData data)
     {
         for (int r = 0; r < BoardConstants.ROWS; r++)
@@ -63,7 +68,14 @@ public class BoardModel
         return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }
 
-    HashSet<Vector2Int> FindMatches()
+    public void Swap(Vector2Int a, Vector2Int b)
+    {
+        PuzzleType temp = grid[a.x, a.y].type;
+        grid[a.x, a.y].type = grid[b.x, b.y].type;
+        grid[b.x, b.y].type = temp;
+    }
+
+    public HashSet<Vector2Int> FindMatches()
     {
         HashSet<Vector2Int> matched = new HashSet<Vector2Int>();
 
@@ -135,7 +147,7 @@ public class BoardModel
     }
 
     // 지우기
-    void RemoveMatches(HashSet<Vector2Int> matched)
+    public void RemoveMatches(HashSet<Vector2Int> matched)
     {
         foreach (Vector2Int pos in matched)
         {
@@ -146,7 +158,7 @@ public class BoardModel
     }
 
     // 낙하
-    void Fall()
+    public void Fall()
     {
         for (int c = 0; c < BoardConstants.COLS; c++)
         {
@@ -166,7 +178,7 @@ public class BoardModel
         }
     }
 
-    void Refill()
+    public void Refill()
     {
         var values = Enum.GetValues(typeof(PuzzleType));
 
@@ -179,22 +191,6 @@ public class BoardModel
                     grid[r, c].type = (PuzzleType)values.GetValue(UnityEngine.Random.Range(1, values.Length));
                 }
             }
-        }
-    }
-
-    public void ProcessBoard()
-    {
-        HashSet<Vector2Int> matched = null;
-
-        // FindMatches → RemoveMatches → Fall → Refill → 반복
-
-        matched = FindMatches();
-        while (matched.Count > 0)
-        {
-            RemoveMatches(matched);
-            Fall();
-            Refill();
-            matched = FindMatches();
         }
     }
 
