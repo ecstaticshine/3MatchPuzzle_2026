@@ -80,14 +80,32 @@ public class BoardController : MonoBehaviour
 
         while (matched.Count > 0)
         {
+            HashSet<int> affectedCols = new HashSet<int>();
+            foreach (var pos in matched)
+            {
+                affectedCols.Add(pos.y);
+            }
+
             // View 갱신
             boardModel.RemoveMatches(matched);
+            foreach (int col in affectedCols)
+            {
+                boardView.UpdateCol(col, boardModel);
+            }
             yield return new WaitForSeconds(0.3f);
             // View 갱신
             boardModel.Fall();
+            foreach (int col in affectedCols)
+            {
+                boardView.UpdateCol(col, boardModel);
+            }
             yield return new WaitForSeconds(0.3f);
             // View 갱신
             boardModel.Refill();
+            foreach (int col in affectedCols)
+            {
+                boardView.UpdateCol(col, boardModel);
+            }
             yield return new WaitForSeconds(0.3f);
             matched = boardModel.FindMatches();
         }

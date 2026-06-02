@@ -60,4 +60,23 @@ public class BoardView : MonoBehaviour
         fruitPool[index].GetComponent<SpriteRenderer>().sprite = fruitSprites[(int)type - 1];
         fruitPool[index].SetActive(type != PuzzleType.None);
     }
+
+    public void UpdateCol(int col, BoardModel boardModel)
+    {
+        for(int r = 0; r < BoardConstants.ROWS; r++)
+        {
+            int index = r * BoardConstants.COLS + col;
+            Cell cell = boardModel.GetCell(r, col);
+
+            if (cell.isActive && cell.type != PuzzleType.None)
+            {
+                fruitPool[index].SetActive(true);
+                fruitPool[index].GetComponent<SpriteRenderer>().sprite = fruitSprites[(int)cell.type - 1];
+            }
+            else
+            {
+                fruitPool[index].SetActive(false);
+            }
+        }
+    }
 }
